@@ -132,7 +132,23 @@ const actions = {
       context.theDeals = 'Get 10% Off With XYZ'
       return resolve(context)
     })
+  },
+
+
+  pickGreeting({context, entities}) {
+  return new Promise(function (resolve, reject) {
+    var greetings = [
+    'Hi',
+    'Alright?',
+    'Hey There',
+    'Sup?',
+    'Hello!'
+    ]
+    var randomNumber = Math.floor(Math.random()*textArray.length);
+      context.greeting = greetings[randomNumber];
+      return resolve(context)
   }
+
 }
 
 // Setting up our bot
