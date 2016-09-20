@@ -142,7 +142,6 @@ const actions = {
         'Hey,',
         'Sup?',
         'Hello!',
-        "How's it going?",
         'Hi!'
       ]
 
