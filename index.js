@@ -79,7 +79,7 @@ var fbMessage = function fbMessage (id, text) {
 // This will contain all user sessions.
 // Each session has an entry:
 // sessionId -> {fbid: facebookUserId, context: sessionState}
-var sessions = {}df
+var sessions = {}
 
 var findOrCreateSession = function findOrCreateSession (fbid) {
   var sessionId = void 0
@@ -107,8 +107,6 @@ const actions = {
       console.log('sending...', JSON.stringify(response))
       fbMessage(sender, JSON.stringify(response)).catch(console.error)
 
-
-
       return resolve()
     })
   },
@@ -122,11 +120,6 @@ const actions = {
     })
   }
 }
-
-
-
-
-
 
 // Setting up our bot
 var wit = new Wit({
