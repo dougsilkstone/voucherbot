@@ -79,7 +79,7 @@ var fbMessage = function fbMessage (id, text) {
 // This will contain all user sessions.
 // Each session has an entry:
 // sessionId -> {fbid: facebookUserId, context: sessionState}
-var sessions = {}
+var sessions = {}df
 
 var findOrCreateSession = function findOrCreateSession (fbid) {
   var sessionId = void 0
@@ -105,9 +105,14 @@ const actions = {
     const {text, quickreplies} = response
     return new Promise(function (resolve, reject) {
       console.log('sending...', JSON.stringify(response))
+      fbMessage(sender, JSON.stringify(response)).catch(console.error)
+
+
+
       return resolve()
     })
   },
+
   getVouchers({context, entities}) {
     return new Promise(function (resolve, reject) {
       // Here should go the api call, e.g.:
@@ -117,6 +122,11 @@ const actions = {
     })
   }
 }
+
+
+
+
+
 
 // Setting up our bot
 var wit = new Wit({
