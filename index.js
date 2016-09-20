@@ -174,7 +174,7 @@ app.post('/webhook', function (req, res) {
   if (data.object === 'page') {
     data.entry.forEach(function (entry) {
       entry.messaging.forEach(function (event) {
-        if (event.message) {
+        if (event.message && !event.message.is_echo) {
           (function () {
             // Yay! We got a new message!
             // We retrieve the Facebook user ID of the sender
