@@ -1,16 +1,15 @@
+
 {
-  "name": "secretbots",
-  "version": "1.0.0",
-  "description": "",
+  "name": "voucherb0t",
+  "version": "0.0.0",
+  "description": "A sample app demonstrating how to run node with ES6 Harmony enabled on Heroku.",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node --harmony --use_strict --harmony_generators index.js"
   },
-  "author": "",
+  "author": "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com/)",
   "license": "ISC",
-  "dependencies": {
-    "body-parser": "^1.15.0",
-    "express": "^4.13.4",
-    "request": "^2.71.0"
+  "engines": {
+    "node": "^0.11.9"
   }
 }
