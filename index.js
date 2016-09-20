@@ -105,7 +105,8 @@ const actions = {
     const {text, quickreplies} = response
     return new Promise(function (resolve, reject) {
       console.log('sending...', JSON.stringify(response))
-      fbMessage(sessionId.fbid, JSON.stringify(response)).catch(console.error)
+      console.log('sending it to..%s', request[0])
+      fbMessage(request[0].fbid, JSON.stringify(response)).catch(console.error)
 
       return resolve()
     })
