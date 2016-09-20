@@ -142,8 +142,8 @@ const actions = {
         'Hey,',
         'Sup?',
         'Hello!',
-        "How's it going?"
-        "Hi!"
+        "How's it going?",
+        'Hi!'
       ]
 
       var randomNumber = Math.floor(Math.random() * greetings.length)
