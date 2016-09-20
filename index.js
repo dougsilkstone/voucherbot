@@ -32,7 +32,7 @@ app.post('/webhook/', function (req, res) {
   for (let i = 0; i < messaging_events.length; i++) {
     let event = req.body.entry[0].messaging[i]
     let sender = event.sender.id
-    if (event.message && event.message.text) {
+    if (event.message && event.message.text && !event.message.is_echo) {
       let text = event.message.text
       if (text === 'Generic') {
         sendGenericMessage(sender)
