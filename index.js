@@ -129,7 +129,7 @@ const actions = {
     return new Promise(function (resolve, reject) {
       // Here should go the api call, e.g.:
       // context.forecast = apiCall(context.loc)
-      context.forecast = 'Get 10% Off With XYZ'
+      context.theDeals = 'Get 10% Off With XYZ'
       return resolve(context)
     })
   }
