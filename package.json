@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    start": "node --harmony --use_strict --harmony_generators index.js";
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "author": "",
