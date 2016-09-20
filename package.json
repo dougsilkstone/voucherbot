@@ -10,6 +10,6 @@
   "author": "Zeke Sikelianos <zeke@sikelianos.com> (http://zeke.sikelianos.com/)",
   "license": "ISC",
   "engines": {
-    "node": "^0.11.9"
+    "node": "^6.6.0"
   }
 }
