@@ -22,6 +22,9 @@ git commit -m 'xyz'
 git push heroku master
 
 
+Use heroku logs -t to get realtime access to heroku logs.
+
+
 Syntax issues locally? Update to 6.6.x Node - 
 <<<<<<< HEAD
 Ended up using the Node Harmony Example to allow ES6 code to run on Heroku - package.json should reflect that. 
