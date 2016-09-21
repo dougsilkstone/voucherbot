@@ -19,6 +19,7 @@ cd voucherbot
 npm install
 heroku create
 git commit -m 'xyz'
+git push heroku master
 
 
 Syntax issues locally? Update to 6.6.x Node - 
