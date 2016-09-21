@@ -129,7 +129,18 @@ const actions = {
     return new Promise(function (resolve, reject) {
       // Here should go the api call, e.g.:
       // context.forecast = apiCall(context.loc)
-      context.theDeals = 'Get 10% Off With XYZ'
+
+      var merchantName = null
+      merchantName = firstEntityValue(entities, 'merchant')
+      if (merchantName) {
+        context.merchant = merchantName
+        context.deals = getDeal() + ' at ' + merchantName
+        console.log(merchantName)
+      }
+
+      var getDealPlaceholder = getDeal()
+      console.log('Selected Deal:', getDealPlaceholder)
+      context.theDeals = getDealPlaceholder
       return resolve(context)
     })
   },
@@ -151,6 +162,33 @@ const actions = {
     })
   }
 
+}
+
+const firstEntityValue = (entities, entity) => {
+  const val = entities && entities[entity] &&
+  Array.isArray(entities[entity]) &&
+  entities[entity].length > 0 &&
+  entities[entity][0].value
+
+  if (!val) {
+    return null
+  }
+  return typeof val === 'object' ? val.value : val
+}
+
+const getDeal = function () {
+  var deals = [
+    '10% Off Your First Order',
+    'Buy One Get One Free',
+    'Free Delivery',
+    '£50 Off ',
+    '2-4-1 Shoes',
+    'Crappy Generic Deal'
+  ]
+
+  var randomNumber = Math.floor(Math.random() * deals.length)
+  var offerDeal = deals[randomNumber]
+  return offerDeal
 }
 
 // Setting up our bot
