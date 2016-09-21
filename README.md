@@ -1,4 +1,4 @@
-# 🤖 Creating your own Facebook Messenger bot
+# 🤖 Wit.ai Integrated Bot Project
 
 In the Heroku Dashboard (Your Project > Settings > Config Variables) make sure to set the following..
 
@@ -22,7 +22,11 @@ git commit -m 'xyz'
 
 
 Syntax issues locally? Update to 6.6.x Node - 
+<<<<<<< HEAD
+Ended up using the Node Harmony Example to allow ES6 code to run on Heroku - package.json should reflect that. 
+=======
 Ended up using the Node Harmony Example to allow ES6 code to run on Heroku - package.json should reflect that
+>>>>>>> 71286720f09bfe0cb25bbc9587832b11ef40805c
 ```
 
 
