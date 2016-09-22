@@ -19,6 +19,11 @@ var express = require('express')
 var fetch = require('node-fetch')
 var request = require('request')
 
+var algoliasearch = require('algoliasearch')
+var algoliasearch = require('algoliasearch/lite')
+var client = algoliasearch('LGJV9YLQAJ', 'cd7a1fc84827759c6f8a496a80e05391')
+var index = client.initIndex('Merchants')
+
 var Wit = null
 var log = null
 try {
@@ -54,7 +59,7 @@ var FB_VERIFY_TOKEN = process.env.FB_VERIFY_TOKEN
 // See the Send API reference
 // https://developers.facebook.com/docs/messenger-platform/send-api-reference
 
-var fbMessage = function fbMessage (id, text) {
+function sendTextMessage (id, text) {
   var body = JSON.stringify({
     recipient: { id: id },
     message: { text: text }
@@ -70,6 +75,64 @@ var fbMessage = function fbMessage (id, text) {
       throw new Error(json.error.message)
     }
     return json
+  })
+}
+
+function sendGenericMessage (recipientId, details) {
+  var strippedMedia = details.mediaPath.replace('{{options}}fl_strip_profile,f_auto/', '')
+  console.log(details)
+
+  var messageData = {
+    recipient: {
+      id: recipientId
+    },
+    message: {
+      attachment: {
+        type: 'template',
+        payload: {
+          template_type: 'generic',
+          elements: [{
+            title: 'Latest ' + details.tradingName + ' Vouchers',
+            subtitle: details.totalOffers + ' Offers Live',
+            item_url: 'https://www.vouchercloud.com/' + details.urlSlug + '-vouchers',
+            image_url: 'https:' + strippedMedia,
+            buttons: [{
+              type: 'web_url',
+              url: 'https://www.vouchercloud.com/' + details.urlSlug + '-vouchers',
+              title: 'Get Deals Now'
+            }]
+          }]
+        }
+      }
+    }
+  }
+
+  callSendAPI(messageData)
+}
+
+// Makes the final request across all messagetypes
+function callSendAPI (messageData) {
+  request({
+    uri: 'https://graph.facebook.com/v2.6/me/messages',
+    qs: { access_token: FB_PAGE_TOKEN},
+    method: 'POST',
+    json: messageData
+
+  }, function (error, response, body) {
+    if (!error && response.statusCode == 200) {
+      var recipientId = body.recipient_id
+      var messageId = body.message_id
+
+      if (messageId) {
+        console.log('Successfully sent message with id %s to recipient %s',
+          messageId, recipientId)
+      } else {
+        console.log('Successfully called Send API for recipient %s',
+          recipientId)
+      }
+    } else {
+      console.error(response.error)
+    }
   })
 }
 
@@ -108,7 +171,7 @@ const actions = {
       // Yay, we found our recipient!
       // Let's forward our bot response to her.
       // We return a promise to let our bot know when we're done sending
-      return fbMessage(recipientId, text)
+      return sendTextMessage(recipientId, text)
         .then(() => null)
         .catch((err) => {
           console.error(
@@ -125,43 +188,53 @@ const actions = {
     }
   },
 
-  getVouchers({context, entities}) {
+  getVouchers({context, entities, sessionId}) {
     return new Promise(function (resolve, reject) {
       // Here should go the api call, e.g.:
       // context.forecast = apiCall(context.loc)
 
       var merchantName = null
       merchantName = firstEntityValue(entities, 'merchant')
-      if (merchantName) {
-        context.merchant = merchantName
-        context.deals = getDeal() + ' at ' + merchantName
-        console.log(merchantName)
+
+      if (!merchantName) {
+        context.missingMerchant = 'true'
       }
 
-      var getDealPlaceholder = getDeal()
-      console.log('Selected Deal:', getDealPlaceholder)
-      context.theDeals = getDealPlaceholder
-      return resolve(context)
+      index.search(merchantName, {filters: 'status:1 AND countryCode:"GB"'}, function searchDone (err, content) {
+        // console.log(err, content)
+
+        context.merchantName = merchantName
+        context.merchantUrl = 'https://www.vouchercloud.com/' + content.hits[0].urlSlug + '-vouchers'
+        context.theDeals = 'true'
+
+        var fbid = sessions[sessionId].fbid
+        console.log('THIS IS THE FBID:', fbid)
+
+        sendGenericMessage(fbid, content.hits[0])
+
+        return resolve(context)
+      })
     })
   },
 
-  pickGreeting({context, entities}) {
-    return new Promise(function (resolve, reject) {
-      var greetings = [
-        'Hi',
-        'Alright?',
-        'Hey,',
-        'Sup?',
-        'Hello!',
-        'Hi!'
-      ]
+  sendGeneric({context, entities, sessionId}) {
 
-      var randomNumber = Math.floor(Math.random() * greetings.length)
-      context.greeting = greetings[randomNumber]
+    // Grabbing sessionId as an argument lets us grab the fbid, so we can fire off custom message types..
+
+    var fbid = sessions[sessionId].fbid
+    console.log('THIS IS THE FBID:', fbid)
+
+    sendGenericMessage(fbid)
+
+    return new Promise(function (resolve, reject) {
+      if (fbid) {
+        console.log('fbid: ', fbid)
+      }
+      context.agreement = "Don't listen to the first sentence"
+      context.disagreement = 'This is another lie'
       return resolve(context)
     })
   }
-
 }
 
 const firstEntityValue = (entities, entity) => {
@@ -174,21 +247,6 @@ const firstEntityValue = (entities, entity) => {
     return null
   }
   return typeof val === 'object' ? val.value : val
-}
-
-const getDeal = function () {
-  var deals = [
-    '10% Off Your First Order',
-    'Buy One Get One Free',
-    'Free Delivery',
-    '£50 Off ',
-    '2-4-1 Shoes',
-    'Crappy Generic Deal'
-  ]
-
-  var randomNumber = Math.floor(Math.random() * deals.length)
-  var offerDeal = deals[randomNumber]
-  return offerDeal
 }
 
 // Setting up our bot
@@ -260,6 +318,9 @@ app.post('/webhook', function (req, res) {
               ).then(function (context) {
                 // Our bot did everything it has to do.
                 // Now it's waiting for further messages to proceed.
+
+                // HERE, WIT HAS DONE EVERYTHING, SO YOU CAN MANIPULATE THE BOT DOING YOUR OWN STUFF
+
                 console.log('Waiting for next user messages')
 
                 // Based on the session state, you might want to reset the session.
